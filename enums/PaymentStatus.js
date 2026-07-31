@@ -1,0 +1,1 @@
+export const PAYMENT_STATUS = ["created","processing","authorized","captured","failed"];
