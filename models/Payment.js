@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
         index: true
     },
     referenceId : {
-        type: Schema.Types.UUID,
+        type: String,
         required: true,
         index: true
     },
