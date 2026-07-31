@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
-import { PAYMENT_STATUS } from "../enums/PaymentStatus";
+import {PAYMENT_STATUS} from "../enums/PaymentStatus.js";
 
 const paymentSchema = new mongoose.Schema({
     paymentId: {
-        type: Schema.Types.UUID,
+        type: String,
         required: true,
         unique: true,
         index: true
