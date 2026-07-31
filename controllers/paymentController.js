@@ -2,6 +2,7 @@ import { Payment } from "../models/Payment.js";
 import {v4 as uuid4} from "uuid";
 import { validateUuid } from "../utils/validateUuid.js";
 import { PAYMENT_CURRENCIES } from "../constants/PaymentCurrencies.js";
+import { createPaymentSchema } from "../validations/payment.validation.js";
 
 export async function createPayment(req,res){
     try {
@@ -13,31 +14,9 @@ export async function createPayment(req,res){
             });
         }
 
-        const {merchantId , referenceId, amount, currency, customerId} = body;
+        const result = createPaymentSchema.parse(body);
 
-        if(merchantId == null || referenceId == null || amount == null || currency == null || customerId == null){
-            return res.status(400).json({
-                message: "Request body missing required fields!"
-            });
-        }
-
-         if(!validateUuid(merchantId) ||  !validateUuid(customerId)){
-            return res.status(400).json({
-                message:"Invalid UUID value!"
-            });
-        }
-
-        if(!Number.isInteger(amount) || amount < 1){
-            return res.status(400).json({
-                message: "Amount must be greater than 0!"
-            });
-        }
-
-        if(!PAYMENT_CURRENCIES.includes(currency)){
-            return res.status(400).json({
-                message: `Currency: ${currency} is not supported!`
-            });
-        }
+        const {merchantId , referenceId, amount, currency, customerId} = result.data;
 
         const createdPayment = await Payment.create(
             {
