@@ -8,3 +8,12 @@ export const createPaymentSchema = z.object({
     currency: z.enum(PAYMENT_CURRENCIES,{error: "Invalid currency value!"}),
     customerId: z.uuidv4({error: "CustomerId is not a valid UUID!"})
 });
+
+export const getPaymentParamsSchema = z.object({
+    paymentId: z.uuidv4({error: "PaymentID is not a valid UUID!"})
+});
+
+export const getAllPaymentsQuerySchema = z.object({
+    offset : z.coerce.number().int().nonnegative().default(0),
+    limit: z.coerce.number().int().nonnegative().default(10),
+}); 
