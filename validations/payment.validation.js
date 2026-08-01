@@ -10,7 +10,7 @@ export const createPaymentSchema = z.object({
 });
 
 export const paymentParamsSchema = z.object({
-    paymentId: z.string().trim().min(1)
+    paymentId: z.string({error: "PaymentId not a valid String!"}).trim().min(1)
 });
 
 export const getAllPaymentsQuerySchema = z.object({
