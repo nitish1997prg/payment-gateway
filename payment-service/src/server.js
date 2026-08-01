@@ -16,7 +16,7 @@ async function startServer(){
         await startProducer();
 
         //Connect Kafka Consumer
-        await startConsumer();
+        //await startConsumer();
 
         app.listen(PORT,()=>{
             console.log(`Server listening on PORT: ${PORT}`);
