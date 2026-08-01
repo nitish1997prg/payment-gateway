@@ -13,3 +13,9 @@ export async function createTestPayment(overrides = {}) {
         ...overrides
     });
 }
+
+export async function findPayment(paymentId){
+    return await Payment.findOne({
+        paymentId
+    });
+}
