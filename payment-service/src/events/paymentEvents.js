@@ -1,17 +1,26 @@
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 
-export function paymentCreatedEvent(payment){
+
+function createPaymentEvent(eventType, payment) {
     return {
-        eventType: PAYMENT_EVENTS.CREATED,
+        eventType,
         timestamp: new Date().toISOString(),
-        data : {
+        data: {
             paymentId: payment.paymentId,
             merchantId: payment.merchantId,
-            referenceId: payment.referenceId,
             customerId: payment.customerId,
+            referenceId: payment.referenceId,
             amount: payment.amount,
             currency: payment.currency,
             status: payment.status
         }
     };
+}
+
+export function paymentCreatedEvent(payment){
+    return createPaymentEvent(PAYMENT_EVENTS.CREATED,payment);
+}
+
+export function paymentCapturedEvent(payment){
+    return createPaymentEvent(PAYMENT_EVENTS.CAPTURED,payment);
 }

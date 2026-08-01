@@ -2,6 +2,8 @@ import { Payment } from "../models/Payment.js";
 import {v4 as uuid4} from "uuid";
 import { createPaymentSchema, getAllPaymentsQuerySchema, paymentParamsSchema } from "../validations/payment.validation.js";
 import { ZodError } from "zod";
+import { publishEvent } from "../kafka/producer.js";
+import { paymentCreatedEvent, paymentCapturedEvent } from "../events/paymentEvents.js";
 
 //Create a Payment
 export async function createPayment(req,res){
@@ -27,6 +29,12 @@ export async function createPayment(req,res){
                 currency,
                 customerId
             }
+        );
+
+        await publishEvent(
+            "payments",
+            createdPayment.paymentId,
+            paymentCreatedEvent(createdPayment)
         );
 
         return res.status(201).json({
@@ -153,6 +161,12 @@ export async function customerPayment(req,res){
         payment.status = "captured";
 
         await payment.save();
+
+        await publishEvent(
+            "payments",
+            payment.paymentId,
+            paymentCapturedEvent(payment)
+        )
 
         return res.status(200).json({
             message: "Payment has been captured successfully!"
