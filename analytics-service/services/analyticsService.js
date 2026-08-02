@@ -13,7 +13,7 @@ export async function recordPaymentCreated(payment){
         },
         {
             upsert: true,
-            new: true
+            returnDocument: 'after'
         }
     );
 }
@@ -25,12 +25,13 @@ export async function recordPaymentCaptured(payment){
         {date},
         {
             $inc: {
-                paymentsCaptured: 1
+                paymentsCaptured: 1,
+                totalRevenue: payment.amount
             }
         },
         {
             upsert: true,
-            new: true
+            returnDocument: 'after'
         }
     );
 }
