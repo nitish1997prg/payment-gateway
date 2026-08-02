@@ -28,6 +28,7 @@ export async function startConsumer(){
                             await handlePaymentEvent(event);
                            }catch(error){
                             console.error("[Analytics] failed to process event",error);
+                            throw error;
                            }
                         }
         }

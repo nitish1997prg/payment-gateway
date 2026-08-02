@@ -37,7 +37,7 @@ const paymentSchema = new mongoose.Schema({
     customerId: {
         type: Schema.Types.UUID,
         required: true
-    }
+    },
 },{timestamps: true});
 
 export const Payment = mongoose.model('Payment',paymentSchema);
