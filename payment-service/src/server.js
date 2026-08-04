@@ -3,6 +3,8 @@ import {app} from "./app.js";
 import { connectDb } from "./config/db.js";
 import { startProducer } from "./kafka/producer.js";
 import { startConsumer } from "./kafka/consumer.js";
+import { watchOutbox } from "./outbox/watcher.js";
+import { startOutboxRecovery } from "./outbox/recovery.js";
 
 const PORT = process.env.PORT;
 const MONGO_URI = process.env.MONGO_URI;
@@ -14,6 +16,10 @@ async function startServer(){
 
         //Connect Kafka Producer
         await startProducer();
+
+        await watchOutbox();
+
+        startOutboxRecovery();
 
         //Connect Kafka Consumer
         //await startConsumer();

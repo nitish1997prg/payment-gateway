@@ -1,5 +1,6 @@
 export const OUTBOX_STATUS = {
     PENDING: "pending",
+    PUBLISHING: "publishing",
     PUBLISHED: "published",
     FAILED: "failed"
 };
