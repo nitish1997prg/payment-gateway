@@ -1,9 +1,9 @@
 import mongoose, {Schema} from "mongoose";
-import { AGGREGATE_TYPES } from "../constants/AggregateTypes.js";
+import { AGGREGATE_TYPES_VALUES } from "../constants/AggregateTypes.js";
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { PAYMENT_CURRENCIES } from "../constants/PaymentCurrencies.js";
-import { PAYMENT_STATUS } from "../enums/PaymentStatus.js";
-import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
+import {  PAYMENT_STATUS_VALUES } from "../enums/PaymentStatus.js";
+import { OUTBOX_STATUS_VALUES } from "../enums/OutboxStatus.js";
 
 
 const outboxEventSchema = new mongoose.Schema({
@@ -15,7 +15,7 @@ const outboxEventSchema = new mongoose.Schema({
     },
     aggregateType: {
         type: String,
-        enum: AGGREGATE_TYPES,
+        enum: AGGREGATE_TYPES_VALUES,
         required: true
     },
     aggregateId: {
@@ -33,7 +33,7 @@ const outboxEventSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: OUTBOX_STATUS,
+        enum: OUTBOX_STATUS_VALUES,
         default: "pending",
         index: true
     },

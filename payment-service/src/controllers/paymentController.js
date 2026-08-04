@@ -4,6 +4,7 @@ import { createPaymentSchema, getAllPaymentsQuerySchema, paymentParamsSchema } f
 import { ZodError } from "zod";
 import { publishEvent } from "../kafka/producer.js";
 import { paymentCreatedEvent, paymentCapturedEvent } from "../events/paymentEvents.js";
+import { PaymentService } from "../services/paymentService.js";
 
 //Create a Payment
 export async function createPayment(req,res){
@@ -18,24 +19,7 @@ export async function createPayment(req,res){
 
         const result = createPaymentSchema.parse(body);
 
-        const {merchantId , referenceId, amount, currency, customerId} = result;
-
-        const createdPayment = await Payment.create(
-            {
-                paymentId: `pay_${uuid4()}`,
-                merchantId,
-                referenceId,
-                amount,
-                currency,
-                customerId
-            }
-        );
-
-        await publishEvent(
-            "payments",
-            createdPayment.paymentId,
-            paymentCreatedEvent(createdPayment)
-        );
+        const createdPayment = await PaymentService.createPayment(result);
 
         return res.status(201).json({
             paymentId: createdPayment.paymentId,
@@ -72,13 +56,8 @@ export async function getPayment(req,res){
         const result = paymentParamsSchema.parse(params);
         const {paymentId} = result;
 
-        const payment = await Payment.findOne({paymentId});
+        const payment = await PaymentService.getPayment(paymentId);
 
-        if(!payment){
-            return res.status(404).json({
-                message: "Payment not found!"
-            });
-        }
 
         return res.status(200).json(payment);
 
@@ -112,7 +91,7 @@ export async function getAllPayments(req,res){
 
         const {offset, limit } = result;
 
-        const payments = await Payment.find({}).skip(offset).limit(limit);
+        const payments = await PaymentService.getAllPayments({offset: offset,limit: limit});
 
         return res.status(200).json(payments);
 
@@ -144,30 +123,8 @@ export async function customerPayment(req,res){
 
         const {paymentId} = result;
 
-        const payment = await Payment.findOne({paymentId});
-
-        if(!payment){
-            return res.status(404).json({
-                message: "Payment not found!"
-            });
-        }
-
-        if(payment.status === "captured"){
-            return res.status(409).json({
-                message: "Payment has already been processed!"
-            });
-        }
-
-        payment.status = "captured";
-
-        await payment.save();
-
-        await publishEvent(
-            "payments",
-            payment.paymentId,
-            paymentCapturedEvent(payment)
-        )
-
+        const payment = await PaymentService.customerPayment(paymentId);
+        
         return res.status(200).json({
             message: "Payment has been captured successfully!"
         });

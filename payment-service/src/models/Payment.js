@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import {PAYMENT_STATUS} from "../enums/PaymentStatus.js";
+import {PAYMENT_STATUS_VALUES} from "../enums/PaymentStatus.js";
 
 const paymentSchema = new mongoose.Schema({
     paymentId: {
@@ -30,7 +30,7 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: PAYMENT_STATUS,
+        enum: PAYMENT_STATUS_VALUES,
         required: true,
         default: "created"
     },
