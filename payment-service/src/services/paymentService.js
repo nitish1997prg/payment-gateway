@@ -18,31 +18,27 @@ export async function createPayment(payment){
 
         try {
 
-            createdPayment = await Payment.create(
-            {
-                paymentId: `pay_${uuid4()}`,
-                merchantId: payment.merchantId,
-                referenceId: payment.referenceId,
-                amount: payment.amount,
-                currency: payment.currency,
-                customerId: payment.customerId
-            },{
-                session
-            }
-            );
+            createdPayment = new Payment({
+                    paymentId: `pay_${uuid()}`,
+                    merchantId: payment.merchantId,
+                    referenceId: payment.referenceId,
+                    amount: payment.amount,
+                    currency: payment.currency,
+                    customerId: payment.customerId
+            });
 
-            await Outbox.create({
-                eventId: uuid(),
-                aggregateType: AGGREGATE_TYPES.PAYMENT,
-                aggregateId: createdPayment.paymentId,
-                eventType: PAYMENT_EVENTS.CREATED,
-                payload: paymentCreatedEvent(createdPayment),
-                status: OUTBOX_STATUS.PENDING
-            },
-            {
-                session
-            }
-            );
+            await createdPayment.save({ session });
+
+            const outboxEvent = new Outbox({
+                    eventId: uuid(),
+                    aggregateType: AGGREGATE_TYPES.PAYMENT,
+                    aggregateId: createdPayment.paymentId,
+                    eventType: PAYMENT_EVENTS.CREATED,
+                    payload: paymentCreatedEvent(createdPayment),
+                    status: OUTBOX_STATUS.PENDING
+                });
+
+            await outboxEvent.save({ session });
 
             await session.commitTransaction();
 
@@ -117,18 +113,16 @@ export async function customerPayment(paymentId){
 
             await payment.save({session});
 
-            await Outbox.create({
+            const outboxEvent = new Outbox({
                 eventId: uuid(),
                 aggregateType: AGGREGATE_TYPES.PAYMENT,
                 aggregateId: payment.paymentId,
                 eventType: PAYMENT_EVENTS.CAPTURED,
                 payload: paymentCapturedEvent(payment),
                 status: OUTBOX_STATUS.PENDING
-            },
-            {
-                session
-            }
-            );
+            })
+
+            await outboxEvent.save({session});
 
             await session.commitTransaction();
 
