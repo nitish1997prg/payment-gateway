@@ -10,62 +10,79 @@ import { AGGREGATE_TYPES } from "../constants/AggregateTypes.js";
 import { PAYMENT_STATUS } from "../enums/PaymentStatus.js";
 import { logger } from "../utils/logger.js";
 import { generateTraceId } from "../utils/trace.js";
+import { withSpan } from "../telemetry/withSpan.js";
 
-export async function createPayment(payment){
-    try {
-        let createdPayment;
+export async function createPayment(payment) {
+    
+    return withSpan("Create Payment", async (span) => {
+
+        span.setAttributes({
+            "payment.referenceId": payment.referenceId,
+            "payment.amount": payment.amount,
+            "payment.currency": payment.currency,
+            "payment.merchantId": payment.merchantId
+        });
+
         const traceId = generateTraceId();
-        const session = await mongoose.startSession();
 
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
 
-            createdPayment = new Payment({
-                    paymentId: `pay_${uuid()}`,
-                    merchantId: payment.merchantId,
-                    referenceId: payment.referenceId,
-                    amount: payment.amount,
-                    currency: payment.currency,
-                    customerId: payment.customerId
+            const createdPayment = new Payment({
+                paymentId: `pay_${uuid()}`,
+                merchantId: payment.merchantId,
+                referenceId: payment.referenceId,
+                amount: payment.amount,
+                currency: payment.currency,
+                customerId: payment.customerId
             });
 
-            await createdPayment.save({ session });
+            await withSpan("Save Payment", async () => {
+                await createdPayment.save({ session });
+            });
 
-            const outboxEvent = new Outbox({
+            span.setAttribute(
+                "payment.paymentId",
+                createdPayment.paymentId
+            );
+
+            await withSpan("Create Outbox Event", async () => {
+
+                const outboxEvent = new Outbox({
                     eventId: uuid(),
                     aggregateType: AGGREGATE_TYPES.PAYMENT,
                     aggregateId: createdPayment.paymentId,
                     eventType: PAYMENT_EVENTS.CREATED,
-                    payload: paymentCreatedEvent(createdPayment,traceId),
+                    payload: paymentCreatedEvent(createdPayment, traceId),
                     status: OUTBOX_STATUS.PENDING
                 });
 
-            await outboxEvent.save({ session });
+                await outboxEvent.save({ session });
 
-            await session.commitTransaction();
+            });
 
+            await withSpan("Commit Transaction", async () => {
+                await session.commitTransaction();
+            });
 
-        }catch(error) {
+            return createdPayment;
+
+        } catch (error) {
+
             await session.abortTransaction();
             throw error;
+
         } finally {
+
             await session.endSession();
+
         }
-       
 
-        //  await publishEvent(
-        //         "payments",
-        //         createdPayment.paymentId,
-        //         paymentCreatedEvent(createdPayment)
-        //     );
-
-        return createdPayment;
-
-    }catch(error){
-        throw error;
-    }
+    });
 }
+
 
 export async function getPayment(paymentId){
     try {
