@@ -16,7 +16,9 @@ export async function handlePaymentEvent(event) {
                     delay: 2000
                 }
             });
-            logger.info("Added job inside webhook BullMQ Queue")
+            logger.info({
+                traceId: event.traceId,
+            },"Added job inside webhook BullMQ Queue")
             break;
 
         default:

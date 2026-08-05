@@ -12,6 +12,7 @@ export function handlePaymentEvent(event) {
         case PAYMENT_EVENTS.CAPTURED:
             logger.info(
                 {
+                    traceId: event.traceId,
                     paymentId: event.data.paymentId
                 }, "Sending notification"
             );

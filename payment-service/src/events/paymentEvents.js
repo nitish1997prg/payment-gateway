@@ -1,8 +1,9 @@
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 
 
-function createPaymentEvent(eventType, payment) {
+function createPaymentEvent(eventType, payment,traceId) {
     return {
+        traceId,
         eventType,
         timestamp: new Date().toISOString(),
         data: {
@@ -17,10 +18,10 @@ function createPaymentEvent(eventType, payment) {
     };
 }
 
-export function paymentCreatedEvent(payment){
-    return createPaymentEvent(PAYMENT_EVENTS.CREATED,payment);
+export function paymentCreatedEvent(payment,traceId){
+    return createPaymentEvent(PAYMENT_EVENTS.CREATED,payment,traceId);
 }
 
-export function paymentCapturedEvent(payment){
-    return createPaymentEvent(PAYMENT_EVENTS.CAPTURED,payment);
+export function paymentCapturedEvent(payment,traceId){
+    return createPaymentEvent(PAYMENT_EVENTS.CAPTURED,payment,traceId);
 }

@@ -9,10 +9,12 @@ import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
 import { AGGREGATE_TYPES } from "../constants/AggregateTypes.js";
 import { PAYMENT_STATUS } from "../enums/PaymentStatus.js";
 import { logger } from "../utils/logger.js";
+import { generateTraceId } from "../utils/trace.js";
 
 export async function createPayment(payment){
     try {
         let createdPayment;
+        const traceId = generateTraceId();
         const session = await mongoose.startSession();
 
         session.startTransaction();
@@ -35,7 +37,7 @@ export async function createPayment(payment){
                     aggregateType: AGGREGATE_TYPES.PAYMENT,
                     aggregateId: createdPayment.paymentId,
                     eventType: PAYMENT_EVENTS.CREATED,
-                    payload: paymentCreatedEvent(createdPayment),
+                    payload: paymentCreatedEvent(createdPayment,traceId),
                     status: OUTBOX_STATUS.PENDING
                 });
 
@@ -93,6 +95,8 @@ export async function getAllPayments({offset=0, limit=10}){
 export async function customerPayment(paymentId){
     try {
         let payment;
+
+        const traceId = generateTraceId();
                 
         const session = await mongoose.startSession();
 
@@ -119,7 +123,7 @@ export async function customerPayment(paymentId){
                 aggregateType: AGGREGATE_TYPES.PAYMENT,
                 aggregateId: payment.paymentId,
                 eventType: PAYMENT_EVENTS.CAPTURED,
-                payload: paymentCapturedEvent(payment),
+                payload: paymentCapturedEvent(payment,traceId),
                 status: OUTBOX_STATUS.PENDING
             })
 

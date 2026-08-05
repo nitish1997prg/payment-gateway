@@ -13,7 +13,13 @@ export function startWebhookWorker() {
         console.log("Job data",job.data);
         switch(job.name){
             case "deliver-webhook":
-                await axios.post(process.env.MERCHANT_WEBHOOK_URL,job.data);
+                await axios.post(process.env.MERCHANT_WEBHOOK_URL,job.data,
+                      {
+                headers: {
+                "X-Trace-Id": job.data.traceId
+                }
+             }
+                );
                 break;
             default:
                 console.log(`[Webhook Worker] Ignoring job: ${job.name}`);
@@ -26,12 +32,14 @@ export function startWebhookWorker() {
 
     worker.on("completed", (job) => {
         logger.info({
+            traceId: job?.traceId,
             jobId: job.id
         },"Job completed");
     });
 
     worker.on("failed", (job, err) => {
         logger.error({
+            traceId: job?.traceId,
             err: err,
             jobId: job?.id 
         },"Job failed");
