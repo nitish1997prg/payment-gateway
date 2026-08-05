@@ -1,4 +1,15 @@
 services:
+
+  
+  mongodb:
+    image: mongo:8
+    container_name: mongodb
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongodb-data:/data/db
   kafka:
     image: apache/kafka:4.0.0
     container_name: kafka
@@ -31,3 +42,44 @@ services:
 
     ports:
       - "6379:6379"
+  payment-service:
+    build:
+      context: ./payment-service
+
+    container_name: payment-service
+
+    env_file:
+      - ./payment-service/.env.docker
+
+    ports:
+      - "5000:5000"
+
+    depends_on:
+      - mongodb
+      - kafka
+  notification-service:
+    build:
+      context: ./notification-service
+
+    container_name: notification-service
+
+    env_file:
+      - ./notification-service/.env.docker
+
+    depends_on:
+      - kafka
+  webhook-service:
+    build:
+      context: ./webhook-service
+
+    container_name: webhook-service
+
+    env_file:
+      - ./webhook-service/.env
+
+    ports:
+      - "5002:5002"
+
+    depends_on:
+     - kafka
+      - redis
