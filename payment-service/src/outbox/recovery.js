@@ -2,11 +2,13 @@ import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
 import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
 import { publishEvent } from "../kafka/producer.js";
 import { Outbox } from "../models/OutboxEvent.js";
+import { logger } from "../utils/logger.js";
 
 const MAX_RETRIES = 10;
 export async function retryOutboxEvents(){
     try {
         while(true){
+           
             const event = await Outbox.findOneAndUpdate({
                 status: OUTBOX_STATUS.PENDING,
                 retryCount: {$lt: MAX_RETRIES}
@@ -39,14 +41,18 @@ export async function retryOutboxEvents(){
                         }
                     }
                 );
-                
-                        console.log(
-                `Published outbox event ${event.eventId} (${event.eventType})`
-            );
+
+                logger.info({
+                    eventId: event.eventId,
+                    eventType: event.eventType
+                },"Outbox event published!");
+            
 
 
         }catch(error){
-            console.error("Error publishing outbox event!",error);
+            logger.error({
+                err: error
+            },"Error publishing outbox event!");
                 const nextRetryCount = event.retryCount + 1;
                 await Outbox.updateOne(
                 { eventId: event.eventId },
@@ -68,16 +74,19 @@ export async function retryOutboxEvents(){
         }
 
     }catch(error){
-        console.error("Error retrying outbox events!",error);
+        logger.error({
+            err: error
+        },"Error retrying outbox events!");
         throw error;
     }
 }
 
 export function startOutboxRecovery() {
-    console.log("Starting Outbox Recovery...");
+    logger.info("Starting Outbox recovery....");
 
     setInterval(async () => {
         try {
+          
             await retryOutboxEvents();
         } catch (error) {
             console.error("Outbox recovery failed:", error);

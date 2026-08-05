@@ -8,6 +8,7 @@ import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
 import { AGGREGATE_TYPES } from "../constants/AggregateTypes.js";
 import { PAYMENT_STATUS } from "../enums/PaymentStatus.js";
+import { logger } from "../utils/logger.js";
 
 export async function createPayment(payment){
     try {
@@ -123,6 +124,11 @@ export async function customerPayment(paymentId){
             })
 
             await outboxEvent.save({session});
+
+            logger.info({
+                eventId: outboxEvent.eventId,
+                status: outboxEvent.status
+            },"Outbox created");
 
             await session.commitTransaction();
 

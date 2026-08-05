@@ -2,6 +2,7 @@ import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
 import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
 import { publishEvent } from "../kafka/producer.js";
 import { Outbox } from "../models/OutboxEvent.js";
+import { logger } from "../utils/logger.js";
 
 export async function watchOutbox(){
     try {
@@ -28,6 +29,9 @@ export async function watchOutbox(){
                         }
                     }
                 );
+                logger.info({
+                    aggregateId: change.fullDocument.aggregateId
+                },"Outbox event published!");
             }catch(error){
                 await Outbox.updateOne(
                     { eventId: change.fullDocument.eventId },
@@ -42,7 +46,9 @@ export async function watchOutbox(){
                 }
                 );
 
-                console.error(error);
+                logger.error({
+                    err: error
+                })
             }
                 
             

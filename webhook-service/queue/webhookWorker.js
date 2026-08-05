@@ -3,6 +3,7 @@ import { Worker } from "bullmq";
 import { connection } from "./connection.js";
 import axios from "axios";
 import { WEBHOOK_DELIVERY_QUEUE } from "../constants/WebhookQueue.js";
+import { logger } from "../utils/logger.js";
 
 export function startWebhookWorker() {
     const worker =  new Worker(
@@ -24,15 +25,22 @@ export function startWebhookWorker() {
     );
 
     worker.on("completed", (job) => {
-        console.log(`Job ${job.id} completed.`);
+        logger.info({
+            jobId: job.id
+        },"Job completed");
     });
 
     worker.on("failed", (job, err) => {
-        console.error(`Job ${job?.id} failed:`, err.message);
+        logger.error({
+            err: err,
+            jobId: job?.id 
+        },"Job failed");
     });
 
     worker.on("error", (err) => {
-    console.error("Worker error encountered:", err);
+    logger.error({
+        err: err
+    },"Worker error encountered");
     });
 
     console.log("Web hook worker started!");

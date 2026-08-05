@@ -1,4 +1,5 @@
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
+import { logger } from "../utils/logger.js";
 
 export function handlePaymentEvent(event) {
 
@@ -9,8 +10,10 @@ export function handlePaymentEvent(event) {
             break;
 
         case PAYMENT_EVENTS.CAPTURED:
-            console.log(
-                `Sending notification for ${event.data.paymentId}`
+            logger.info(
+                {
+                    paymentId: event.data.paymentId
+                }, "Sending notification"
             );
             break;
 

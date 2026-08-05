@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import { publishEvent } from "../kafka/producer.js";
 import { paymentCreatedEvent, paymentCapturedEvent } from "../events/paymentEvents.js";
 import { PaymentService } from "../services/paymentService.js";
+import { logger } from "../utils/logger.js";
 
 //Create a Payment
 export async function createPayment(req,res){
@@ -21,6 +22,11 @@ export async function createPayment(req,res){
 
         const createdPayment = await PaymentService.createPayment(result);
 
+        logger.info({
+            paymentId: createdPayment.paymentId,
+            status: createdPayment.status,
+        },"Payment Created");
+
         return res.status(201).json({
             paymentId: createdPayment.paymentId,
             status: createdPayment.status,
@@ -35,7 +41,9 @@ export async function createPayment(req,res){
             });
         }
 
-        console.error("Error creating payment!",error);
+        logger.error({
+            err: error
+        },"Error creating payment");
         return res.status(500).json({
             message: "An internal server error occurred while creating a payment!"
         });
@@ -68,7 +76,9 @@ export async function getPayment(req,res){
                 errors: error.issues
             });
         }
-        console.error("Error fetching payment details!",error);
+        logger.error({
+            err: error
+        },"Error fetching payment");
         return res.status(500).json({
             message: "An internal server error occurred while fetching payment details!"
         });
@@ -101,7 +111,9 @@ export async function getAllPayments(req,res){
                 errors: error.issues
             });
         }
-        console.error("Error fetching all payments!",error);
+        logger.error({
+            err: error
+        },"Error fetching all payments");
         return res.status(500).json({
             message: "An internal server error occurred while fetching all payments!"
         })
@@ -124,6 +136,11 @@ export async function customerPayment(req,res){
         const {paymentId} = result;
 
         const payment = await PaymentService.customerPayment(paymentId);
+
+        logger.info({
+            paymentId: payment.paymentId,
+            status: payment.status
+        },"Payment Captured")
         
         return res.status(200).json({
             message: "Payment has been captured successfully!"
@@ -136,7 +153,9 @@ export async function customerPayment(req,res){
                 errors: error.issues
             });
         }
-        console.error("Error in customer payment!",error);
+        logger.error({
+            err: error
+        },"Error in customer payment!");
         return res.status(500).json({
             message: "An internal server error occurred while customer payment! "
         });

@@ -1,6 +1,7 @@
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { sendWebhook } from "../services/webhookService.js";
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
+import { logger } from "../utils/logger.js";
 
 export async function handlePaymentEvent(event) {
     try {
@@ -15,6 +16,7 @@ export async function handlePaymentEvent(event) {
                     delay: 2000
                 }
             });
+            logger.info("Added job inside webhook BullMQ Queue")
             break;
 
         default:

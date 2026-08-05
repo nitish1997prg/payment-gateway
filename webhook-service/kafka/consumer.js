@@ -1,6 +1,7 @@
 import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
 import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
 import {kafka} from "./client.js";
+import { logger } from "../utils/logger.js";
 
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;
 
@@ -21,8 +22,16 @@ export async function startConsumer(){
 
     await consumer.run(
         {
-            eachMessage: async ({message})=> {
+            eachMessage: async ({topic,partition,message})=> {
                            try {
+                            logger.info(
+                            {
+                                topic,
+                                partition,
+                                offset: message.offset
+                            },
+                            "Kafka event received"
+                        );
                             const event = JSON.parse(message.value.toString());
                             console.log("Consumer Data:",event);
                             await handlePaymentEvent(event);

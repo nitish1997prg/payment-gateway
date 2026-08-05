@@ -1,4 +1,5 @@
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
+import { logger } from "../utils/logger.js";
 
 export async function getFailedJobs(){
     const jobs = await webhookDeliveryQueue.getFailed();
@@ -30,6 +31,10 @@ export async function retryFailedJob(jobId){
 
     await job.retry();
 
+    logger.info({
+        jobId: jobId
+    },"Job requeued");
+
     return {
         jobId: job.id,
         status: "requeued"
@@ -51,6 +56,10 @@ export async function deleteFailedJob(jobId){
     }
 
     await job.remove();
+
+    logger.info({
+        jobId: jobId
+    },"Job deleted");
 
     return {
         jobId: job.id,
