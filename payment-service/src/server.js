@@ -5,6 +5,7 @@ import { startProducer } from "./kafka/producer.js";
 import { startConsumer } from "./kafka/consumer.js";
 import { watchOutbox } from "./outbox/watcher.js";
 import { startOutboxRecovery } from "./outbox/recovery.js";
+import { retry } from "./utils/retry.js";
 
 const PORT = process.env.PORT;
 const MONGO_URI = process.env.MONGO_URI;
@@ -12,10 +13,18 @@ const MONGO_URI = process.env.MONGO_URI;
 async function startServer(){
     try {
         //Connect to MongoDB
-        await connectDb(MONGO_URI);
+        await retry(
+            ()=>connectDb(MONGO_URI),{
+                operationName: "MongoDB Connection"
+            });
 
         //Connect Kafka Producer
-        await startProducer();
+        await retry(
+            startProducer,
+            {
+                operationName: "Start Kafka Producer"
+            }
+        );
 
         await watchOutbox();
 

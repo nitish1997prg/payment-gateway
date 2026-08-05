@@ -2,13 +2,16 @@ import "./config/env.js";
 import {app} from "./app.js";
 import { startConsumer } from "./kafka/consumer.js";
 import { startWebhookWorker } from "./queue/webhookWorker.js";
+import { retry } from "./utils/retry.js";
 
 const PORT = process.env.PORT;
 
 async function startServer(){
     try {
         //Start the Kafka consumer
-        await startConsumer();
+        await retry(startConsumer,{
+            operationName: "Start Kafka Consumer"
+        });
 
         //Start BullMQ Webhook Worker
         startWebhookWorker();

@@ -1,12 +1,15 @@
 import "./config/env.js"
 import { startConsumer } from "./kafka/consumer.js";
+import { retry } from "./utils/retry.js";
 
 
 async function startServer(){
     try {
 
         //Start consumer
-        await startConsumer();
+        await retry(startConsumer,{
+            operationName: "Start Kafka Consumer"
+        });
 
     }catch(error){
         console.error("Error starting server!",error);
