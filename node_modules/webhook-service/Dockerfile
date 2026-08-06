@@ -1,14 +1,21 @@
-#Webhook Service
 FROM node:22-alpine
 
 WORKDIR /app
 
+# Copy workspace manifests
 COPY package*.json ./
 
-RUN npm ci
+# Copy the shared package
+COPY packages ./packages
 
-COPY . .
+# Copy the service
+COPY webhook-service ./webhook-service
+
+# Install all workspace dependencies
+RUN npm install
+
+WORKDIR /app/webhook-service
 
 EXPOSE 5002
 
-CMD [ "npm","start" ]
+CMD ["npm", "start"]

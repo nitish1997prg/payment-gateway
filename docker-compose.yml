@@ -59,7 +59,8 @@ services:
 
   payment-service:
     build:
-      context: ./payment-service
+      context: .
+      dockerfile: payment-service/Dockerfile
 
     container_name: payment-service
 
@@ -75,7 +76,8 @@ services:
     restart: unless-stopped
   notification-service:
     build:
-      context: ./notification-service
+      context: .
+      dockerfile: notification-service/Dockerfile
 
     container_name: notification-service
 
@@ -89,7 +91,8 @@ services:
   
   analytics-service:
     build:
-      context: ./analytics-service
+      context: .
+      dockerfile: analytics-service/Dockerfile
 
     container_name: analytics-service
 
@@ -105,7 +108,8 @@ services:
     restart: unless-stopped
   webhook-service:
     build:
-      context: ./webhook-service
+      context: .
+      dockerfile: webhook-service/Dockerfile
 
     container_name: webhook-service
 

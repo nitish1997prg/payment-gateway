@@ -1,9 +1,7 @@
-import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
-import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
+
 import { publishEvent } from "../kafka/producer.js";
 import { Outbox } from "../models/OutboxEvent.js";
-import { withSpan } from "../telemetry/withSpan.js";
-import { logger } from "../utils/logger.js";
+import {KAFKA_TOPICS, OUTBOX_STATUS, withSpan, logger} from "@payment-gateway/shared";
 
 const MAX_RETRIES = 10;
 export async function retryOutboxEvents(){

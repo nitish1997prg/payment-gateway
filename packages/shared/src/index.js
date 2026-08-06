@@ -4,3 +4,4 @@ export * from "./kafka/index.js";
 export * from "./logging/index.js";
 export * from "./telemetry/index.js";
 export * from "./tracing/index.js";
+export * from "./retry/index.js";

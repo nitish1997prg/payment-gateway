@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import {PAYMENT_STATUS_VALUES} from "../enums/PaymentStatus.js";
+import { PAYMENT_STATUS_VALUES } from "@payment-gateway/shared";
 
 const paymentSchema = new mongoose.Schema({
     paymentId: {

@@ -1,4 +1,4 @@
-import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
+import { PAYMENT_EVENTS } from "@payment-gateway/shared";
 
 
 function createPaymentEvent(eventType, payment,traceId) {

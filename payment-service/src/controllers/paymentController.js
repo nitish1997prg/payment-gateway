@@ -5,7 +5,7 @@ import { ZodError } from "zod";
 import { publishEvent } from "../kafka/producer.js";
 import { paymentCreatedEvent, paymentCapturedEvent } from "../events/paymentEvents.js";
 import { PaymentService } from "../services/paymentService.js";
-import { logger } from "../utils/logger.js";
+import { logger } from "@payment-gateway/shared";
 
 //Create a Payment
 export async function createPayment(req,res){
