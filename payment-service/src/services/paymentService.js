@@ -110,7 +110,10 @@ export async function getAllPayments({offset=0, limit=10}){
 }
 
 export async function customerPayment(paymentId){
-    try {
+    return withSpan("Customer Payment",async (span)=>{
+        
+        span.setAttribute("payment.paymentId",paymentId);
+
         let payment;
 
         const traceId = generateTraceId();
@@ -118,10 +121,12 @@ export async function customerPayment(paymentId){
         const session = await mongoose.startSession();
 
         session.startTransaction();
-        
-        try {
 
-            payment = await Payment.findOne({paymentId},null,{session});
+        try {
+            await withSpan("Find Payment",async ()=>{
+                 payment = await Payment.findOne({paymentId},null,{session});
+            });
+           
         
             if(!payment){
                 throw new Error("Payment not found!");
@@ -133,9 +138,12 @@ export async function customerPayment(paymentId){
 
             payment.status = PAYMENT_STATUS.CAPTURED;
 
-            await payment.save({session});
-
-            const outboxEvent = new Outbox({
+            await withSpan("Save Payment",async ()=>{
+                 await payment.save({session});
+            });
+            
+            await withSpan("Create Outbox",async ()=>{
+                const outboxEvent = new Outbox({
                 eventId: uuid(),
                 aggregateType: AGGREGATE_TYPES.PAYMENT,
                 aggregateId: payment.paymentId,
@@ -145,36 +153,30 @@ export async function customerPayment(paymentId){
             })
 
             await outboxEvent.save({session});
+            })
 
             logger.info({
                 eventId: outboxEvent.eventId,
                 status: outboxEvent.status
             },"Outbox created");
 
-            await session.commitTransaction();
+            await withSpan("Commit Transaction",async ()=>{
+                    await session.commitTransaction();
+            });
+
+            return {
+                  paymentId: payment.paymentId,
+                  status: PAYMENT_STATUS.CAPTURED
+            };
 
         }catch(error){
-            await session.abortTransaction();
-            throw error;
-        } finally {
-            await session.endSession();
+              await session.abortTransaction();
+              throw error;
+        }finally {
+               await session.endSession();
         }
         
-        // await publishEvent(
-        //         "payments",
-        //         payment.paymentId,
-        //         paymentCapturedEvent(payment)
-        // );
-
-        return {
-            paymentId: payment.paymentId,
-            status: PAYMENT_STATUS.CAPTURED
-        };
-        
-
-    }catch(error){
-        throw error;
-    }
+    });
 }
 
 export const PaymentService = {
