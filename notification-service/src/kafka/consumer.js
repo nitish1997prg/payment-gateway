@@ -3,6 +3,9 @@ import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
 import { logger } from "../utils/logger.js";
 import {kafka} from "./client.js";
 
+import { context } from "@opentelemetry/api";
+import { extractTraceContext } from "../telemetry/propagation.js";
+
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;
 
 const consumer = kafka.consumer({
@@ -31,11 +34,15 @@ export async function startConsumer(){
                                     },
                                     "Kafka event received"
                                 );
+                            const extractedContext = extractTraceContext(message.headers);
                             const payload = JSON.parse(message.value.toString());
                             logger.info({
                                 payload: payload
                             },"Consumer Data");
-                            handlePaymentEvent(payload);
+                            context.with(
+                                extractedContext,
+                                ()=> handlePaymentEvent(payload)
+                            );
                         }
         }
     )

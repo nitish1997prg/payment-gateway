@@ -1,3 +1,4 @@
+import "./telemetry.js";
 import "./config/env.js";
 import { connectDb } from "./config/db.js";
 import { app } from "./app.js";

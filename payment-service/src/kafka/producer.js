@@ -1,4 +1,5 @@
 import {kafka} from "./client.js";
+import { injectTraceContext } from "../telemetry/propagation.js";
 
 export const producer = kafka.producer();
 
@@ -19,7 +20,8 @@ export async function publishEvent(topic,key,message){
             messages: [
                 {
                     key,
-                    value: JSON.stringify(message)
+                    value: JSON.stringify(message),
+                    headers: injectTraceContext()
                 }
             ]
         }

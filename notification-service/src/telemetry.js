@@ -7,7 +7,7 @@ import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions"
 const sdk = new NodeSDK({
     resource: resourceFromAttributes({
         [SemanticResourceAttributes.SERVICE_NAME]:
-            "webhook-service"
+            process.env.KAFKA_CLIENT_ID
     }),
 
     traceExporter: new OTLPTraceExporter({

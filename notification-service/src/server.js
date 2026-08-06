@@ -1,3 +1,4 @@
+import "./telemetry.js";
 import "./config/env.js"
 import { startConsumer } from "./kafka/consumer.js";
 import { retry } from "./utils/retry.js";

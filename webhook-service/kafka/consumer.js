@@ -3,6 +3,9 @@ import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
 import {kafka} from "./client.js";
 import { logger } from "../utils/logger.js";
 
+import { context } from "@opentelemetry/api";
+import { extractTraceContext } from "../telemetry/propagation.js";
+
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;
 
 const consumer = kafka.consumer({
@@ -34,7 +37,11 @@ export async function startConsumer(){
                         );
                             const event = JSON.parse(message.value.toString());
                             console.log("Consumer Data:",event);
-                            await handlePaymentEvent(event);
+                            const extractedContext = extractTraceContext(message.headers);
+                            await context.with(
+                                extractedContext,
+                                ()=> await handlePaymentEvent(event)
+                            );
                            }catch(error){
                             console.error("[Analytics] failed to process event",error);
                             throw error;
