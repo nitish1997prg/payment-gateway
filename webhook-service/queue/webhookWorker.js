@@ -4,6 +4,7 @@ import { connection } from "./connection.js";
 import axios from "axios";
 import { WEBHOOK_DELIVERY_QUEUE } from "../constants/WebhookQueue.js";
 import { logger } from "../utils/logger.js";
+import { withSpan } from "../telemetry/withSpan.js";
 
 export function startWebhookWorker() {
     const worker =  new Worker(
@@ -13,13 +14,22 @@ export function startWebhookWorker() {
         console.log("Job data",job.data);
         switch(job.name){
             case "deliver-webhook":
-                await axios.post(process.env.MERCHANT_WEBHOOK_URL,job.data,
+                await withSpan("Send Webhook Job",async (span)=>{
+                    span.setAttributes({
+                        "payment.paymentId": job.data.data.paymentId,
+                        "payment.eventType": job.data.eventType,
+                        "payment.traceId": job.data.traceId,
+                        "payment.merchantId": job.data.data.merchantId
+                    })
+                    await axios.post(process.env.MERCHANT_WEBHOOK_URL,job.data,
                       {
-                headers: {
-                "X-Trace-Id": job.data.traceId
-                }
-             }
-                );
+                        headers: {
+                        "X-Trace-Id": job.data.traceId
+                        }
+                        }
+                    );
+                     });
+                
                 break;
             default:
                 console.log(`[Webhook Worker] Ignoring job: ${job.name}`);
@@ -32,14 +42,14 @@ export function startWebhookWorker() {
 
     worker.on("completed", (job) => {
         logger.info({
-            traceId: job?.traceId,
+            traceId: job?.data?.traceId,
             jobId: job.id
         },"Job completed");
     });
 
     worker.on("failed", (job, err) => {
         logger.error({
-            traceId: job?.traceId,
+            traceId: job?.data?.traceId,
             err: err,
             jobId: job?.id 
         },"Job failed");

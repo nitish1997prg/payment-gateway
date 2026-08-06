@@ -2,6 +2,7 @@ import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { sendWebhook } from "../services/webhookService.js";
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
 import { logger } from "../utils/logger.js";
+import { withSpan } from "../telemetry/withSpan.js";
 
 export async function handlePaymentEvent(event) {
     try {
@@ -9,13 +10,22 @@ export async function handlePaymentEvent(event) {
 
         case PAYMENT_EVENTS.CAPTURED:
             console.log("Inside payments events captured state");
-            await webhookDeliveryQueue.add("deliver-webhook",event,{
+            await withSpan("Enqueue Webhook Delivery",async (span)=>{
+                 span.setAttributes({
+                    "payment.paymentId": event.data.data.paymentId,
+                    "payment.eventType": event.data.eventType,
+                    "payment.traceId": event.data.traceId,
+                    "payment.merchantId": event.data.data.merchantId
+                });
+                await webhookDeliveryQueue.add("deliver-webhook",event,{
                 attempts: 5,
                 backoff: {
                     type: "exponential",
                     delay: 2000
                 }
             });
+            })
+           
             logger.info({
                 traceId: event.traceId,
             },"Added job inside webhook BullMQ Queue")
