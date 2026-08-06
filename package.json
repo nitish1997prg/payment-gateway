@@ -1,0 +1,11 @@
+{
+  "name": "payment-gateway",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "payment-service",
+    "notification-service",
+    "analytics-service",
+    "webhook-service"
+  ]
+}
