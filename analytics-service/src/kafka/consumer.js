@@ -42,7 +42,9 @@ export async function startConsumer(){
                             console.log("Consumer Data:",event);
                             await context.with(
                                 extractedConext,
-                               () => await handlePaymentEvent(event)
+                               async () => {
+                                await handlePaymentEvent(event);
+                               }
                             )
                             await handlePaymentEvent(event);
                            }catch(error){

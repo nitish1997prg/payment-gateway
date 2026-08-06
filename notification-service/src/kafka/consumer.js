@@ -41,7 +41,9 @@ export async function startConsumer(){
                             },"Consumer Data");
                             context.with(
                                 extractedContext,
-                                ()=> handlePaymentEvent(payload)
+                                ()=> {
+                                    handlePaymentEvent(payload);
+                                }
                             );
                         }
         }

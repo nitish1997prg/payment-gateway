@@ -40,7 +40,9 @@ export async function startConsumer(){
                             const extractedContext = extractTraceContext(message.headers);
                             await context.with(
                                 extractedContext,
-                                ()=> await handlePaymentEvent(event)
+                               async ()=> {
+                                    await handlePaymentEvent(event);
+                                }
                             );
                            }catch(error){
                             console.error("[Analytics] failed to process event",error);
