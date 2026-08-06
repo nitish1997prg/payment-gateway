@@ -1,5 +1,6 @@
 import {kafka} from "./client.js";
 import { injectTraceContext } from "../telemetry/propagation.js";
+import { context, trace } from "@opentelemetry/api";
 
 export const producer = kafka.producer();
 
@@ -14,6 +15,13 @@ export async function stopProducer(){
 }
 
 export async function publishEvent(topic,key,message){
+    console.log(
+    "Producer Trace:",
+    trace.getSpan(context.active())?.spanContext().traceId
+);
+   const headers = injectTraceContext();
+
+    console.log("Headers:",headers);
     await producer.send(
         {
             topic,
@@ -21,7 +29,7 @@ export async function publishEvent(topic,key,message){
                 {
                     key,
                     value: JSON.stringify(message),
-                    headers: injectTraceContext()
+                    headers: headers
                 }
             ]
         }

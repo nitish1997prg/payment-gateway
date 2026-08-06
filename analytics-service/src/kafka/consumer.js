@@ -3,7 +3,7 @@ import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
 import { logger } from "../utils/logger.js";
 import {kafka} from "./client.js";
 
-import { context } from "@opentelemetry/api";
+import { trace,context } from "@opentelemetry/api";
 import { extractTraceContext } from "../telemetry/propagation.js";
 
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;
@@ -27,6 +27,11 @@ export async function startConsumer(){
         {
             eachMessage: async ({topic,partition,message})=> {
                            try {
+                             console.log("Message Headers:",message.headers);
+                             console.log(
+        "Consumer Trace:",
+        trace.getSpan(context.active())?.spanContext().traceId
+    );
                             logger.info(
                                 {
                                     topic,

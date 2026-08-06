@@ -1,7 +1,8 @@
 import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { logger } from "../utils/logger.js";
+import { withSpan } from "../telemetry/withSpan.js";
 
-export function handlePaymentEvent(event) {
+export async function handlePaymentEvent(event) {
 
     switch (event.eventType) {
 
@@ -10,12 +11,14 @@ export function handlePaymentEvent(event) {
             break;
 
         case PAYMENT_EVENTS.CAPTURED:
-            logger.info(
-                {
-                    traceId: event.traceId,
-                    paymentId: event.data.paymentId
-                }, "Sending notification"
-            );
+            await withSpan("Process Payment Event", async () => {
+
+                logger.info({
+                traceId: event.traceId,
+                paymentId: event.data.paymentId
+            }, "Sending notification");
+
+            });
             break;
 
         default:

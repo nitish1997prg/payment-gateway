@@ -1,10 +1,13 @@
 import { Analytics } from "../models/Analytics.js";
 import { getCurrentAnalyticsDate } from "../utils/date.js";
+import {withSpan} from "../telemetry/withSpan.js";
 
 export async function recordPaymentCreated(payment){
+    return withSpan("Payment Created",async ()=>{
     const date = getCurrentAnalyticsDate();
 
-    await Analytics.findOneAndUpdate(
+    await withSpan("Update Analytics",async ()=>{
+        await Analytics.findOneAndUpdate(
         {date},
         {
             $inc: {
@@ -16,12 +19,19 @@ export async function recordPaymentCreated(payment){
             returnDocument: 'after'
         }
     );
+    });
+    
+    })
+    
 }
 
 export async function recordPaymentCaptured(payment){
+    return withSpan("Payment Captured",async ()=>{
+
     const date = getCurrentAnalyticsDate();
 
-    await Analytics.findOneAndUpdate(
+    await withSpan("Update Analytics",async ()=>{
+         await Analytics.findOneAndUpdate(
         {date},
         {
             $inc: {
@@ -34,6 +44,11 @@ export async function recordPaymentCaptured(payment){
             returnDocument: 'after'
         }
     );
+    });
+   
+
+    });
+    
 }
 
 export async function getAllAnalytics(){

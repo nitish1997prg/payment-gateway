@@ -5,6 +5,8 @@ import axios from "axios";
 import { WEBHOOK_DELIVERY_QUEUE } from "../constants/WebhookQueue.js";
 import { logger } from "../utils/logger.js";
 import { withSpan } from "../telemetry/withSpan.js";
+import { extractTraceContext } from "../telemetry/propagation.js";
+import { context } from "@opentelemetry/api"
 
 export function startWebhookWorker() {
     const worker =  new Worker(
@@ -14,7 +16,10 @@ export function startWebhookWorker() {
         console.log("Job data",job.data);
         switch(job.name){
             case "deliver-webhook":
-                await withSpan("Send Webhook Job",async (span)=>{
+                const extractedContext = extractTraceContext(job.data.traceContext);
+                await context.with(extractedContext, async ()=>{
+                    await withSpan("Send Webhook Job",async (span)=>{
+                    
                     span.setAttributes({
                         "payment.paymentId": job.data.paymentId,
                         "payment.eventType": job.eventType,
@@ -29,7 +34,8 @@ export function startWebhookWorker() {
                         }
                     );
                      });
-                
+                });
+                          
                 break;
             default:
                 console.log(`[Webhook Worker] Ignoring job: ${job.name}`);

@@ -3,6 +3,7 @@ import { sendWebhook } from "../services/webhookService.js";
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
 import { logger } from "../utils/logger.js";
 import { withSpan } from "../telemetry/withSpan.js";
+import { injectTraceContext } from "../telemetry/propagation.js";
 
 export async function handlePaymentEvent(event) {
     try {
@@ -17,7 +18,10 @@ export async function handlePaymentEvent(event) {
                     "payment.traceId": event.traceId,
                     "payment.merchantId": event.data.merchantId
                 });
-                await webhookDeliveryQueue.add("deliver-webhook",event,{
+                await webhookDeliveryQueue.add("deliver-webhook",{
+                    ...event,
+                    traceContext: injectTraceContext()
+                },{
                 attempts: 5,
                 backoff: {
                     type: "exponential",
