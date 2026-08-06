@@ -141,9 +141,9 @@ export async function customerPayment(paymentId){
             await withSpan("Save Payment",async ()=>{
                  await payment.save({session});
             });
-            
+            let outboxEvent;
             await withSpan("Create Outbox",async ()=>{
-                const outboxEvent = new Outbox({
+                outboxEvent = new Outbox({
                 eventId: uuid(),
                 aggregateType: AGGREGATE_TYPES.PAYMENT,
                 aggregateId: payment.paymentId,

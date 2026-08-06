@@ -12,10 +12,10 @@ export async function handlePaymentEvent(event) {
             console.log("Inside payments events captured state");
             await withSpan("Enqueue Webhook Delivery",async (span)=>{
                  span.setAttributes({
-                    "payment.paymentId": event.data.data.paymentId,
-                    "payment.eventType": event.data.eventType,
-                    "payment.traceId": event.data.traceId,
-                    "payment.merchantId": event.data.data.merchantId
+                    "payment.paymentId": event.data.paymentId,
+                    "payment.eventType": event.eventType,
+                    "payment.traceId": event.traceId,
+                    "payment.merchantId": event.data.merchantId
                 });
                 await webhookDeliveryQueue.add("deliver-webhook",event,{
                 attempts: 5,

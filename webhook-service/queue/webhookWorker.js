@@ -16,10 +16,10 @@ export function startWebhookWorker() {
             case "deliver-webhook":
                 await withSpan("Send Webhook Job",async (span)=>{
                     span.setAttributes({
-                        "payment.paymentId": job.data.data.paymentId,
-                        "payment.eventType": job.data.eventType,
-                        "payment.traceId": job.data.traceId,
-                        "payment.merchantId": job.data.data.merchantId
+                        "payment.paymentId": job.data.paymentId,
+                        "payment.eventType": job.eventType,
+                        "payment.traceId": job.traceId,
+                        "payment.merchantId": job.data.merchantId
                     })
                     await axios.post(process.env.MERCHANT_WEBHOOK_URL,job.data,
                       {
