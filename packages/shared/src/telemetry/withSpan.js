@@ -1,6 +1,7 @@
 import { SpanStatusCode } from "@opentelemetry/api";
-import { tracer } from "./tracer.js";
+import { createTracer } from "./tracer.js";
 
+const tracer = createTracer();
 export async function withSpan(name, callback) {
     console.log(`Starting span: ${name}`);
     return tracer.startActiveSpan(name, async (span) => {

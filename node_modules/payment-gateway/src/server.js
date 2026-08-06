@@ -3,7 +3,6 @@ import "./config/env.js";
 import {app} from "./app.js";
 import { connectMongo, retry } from "@payment-gateway/shared";
 import { startProducer } from "./kafka/producer.js";
-import { startConsumer } from "./kafka/consumer.js";
 import { watchOutbox } from "./outbox/watcher.js";
 import { startOutboxRecovery } from "./outbox/recovery.js";
 
