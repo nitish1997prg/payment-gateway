@@ -104,32 +104,31 @@ A --> B
 
 # Architecture Diagram
 
-````markdown
 ```mermaid
 flowchart LR
 
     Client["Client / Merchant"]
 
-    subgraph Payment["Payment Service"]
+    subgraph PaymentService["Payment Service"]
         API["REST API"]
-        PaymentDB[("Payments")]
-        Outbox[("Outbox")]
+        PaymentDB["Payments Collection"]
+        Outbox["Outbox Collection"]
         Publisher["Outbox Publisher"]
     end
 
-    Kafka[(Kafka)]
+    Kafka["Kafka"]
 
-    subgraph Notification["Notification Service"]
+    subgraph NotificationService["Notification Service"]
         NotifyConsumer["Kafka Consumer"]
         NotificationHandler["Notification Handler"]
     end
 
-    subgraph Analytics["Analytics Service"]
+    subgraph AnalyticsService["Analytics Service"]
         AnalyticsConsumer["Kafka Consumer"]
         AnalyticsHandler["Analytics Handler"]
     end
 
-    subgraph Webhook["Webhook Service"]
+    subgraph WebhookService["Webhook Service"]
         WebhookConsumer["Kafka Consumer"]
         BullMQ["BullMQ Queue"]
         Worker["Webhook Worker"]
@@ -157,7 +156,6 @@ flowchart LR
     BullMQ --> Worker
     Worker --> Merchant
 ```
-````
 
 ---
 
