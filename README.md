@@ -482,6 +482,16 @@ docker compose up --build
 
 ---
 
+# Screenshots
+
+## Payment Captured Event Trace Graph
+
+![Trace Graph](./assets/trace_graph.png)
+
+## Payment Captured Event Trace Timeline
+
+![Trace Timeline](./assets/trace_timeline.png)
+
 # Concepts Demonstrated
 
 * Microservices Architecture
