@@ -1,8 +1,5 @@
+import "./telemetry.js";
 import "./config/env.js";
-
-import { initializeTelemetry } from "@payment-gateway/shared";
-initializeTelemetry();
-
 import {app} from "./app.js";
 import { connectMongo, retry } from "@payment-gateway/shared";
 import { startProducer } from "./kafka/producer.js";

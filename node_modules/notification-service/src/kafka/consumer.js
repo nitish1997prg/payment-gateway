@@ -1,6 +1,7 @@
 import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
 import { trace,context } from "@opentelemetry/api";
-import { KAFKA_TOPICS, logger, extractTraceContext, createKafkaClient } from "@payment-gateway/shared";
+import { KAFKA_TOPICS, logger, createKafkaClient } from "@payment-gateway/shared";
+import {extractTraceContext} from "../telemetry/propagation.js";
 
 const kafka = createKafkaClient();
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;

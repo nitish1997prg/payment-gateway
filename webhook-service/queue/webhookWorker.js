@@ -3,7 +3,9 @@ import { Worker } from "bullmq";
 import { connection } from "./connection.js";
 import axios from "axios";
 import { context } from "@opentelemetry/api"
-import { logger, withSpan, extractTraceContext, WEBHOOK_DELIVERY_QUEUE} from "@payment-gateway/shared";
+import { logger, WEBHOOK_DELIVERY_QUEUE} from "@payment-gateway/shared";
+import { extractTraceContext } from "../telemetry/propagation.js";
+import {withSpan} from "../telemetry/withSpan.js";
 
 export function startWebhookWorker() {
     const worker =  new Worker(

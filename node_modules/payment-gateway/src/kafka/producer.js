@@ -1,6 +1,6 @@
 import { createKafkaClient } from "@payment-gateway/shared";
-import { injectTraceContext } from "@payment-gateway/shared";
 import { context, trace } from "@opentelemetry/api";
+import {injectTraceContext} from "../telemetry/propagation.js";
 
 const kafka = createKafkaClient();
 export const producer = kafka.producer();
