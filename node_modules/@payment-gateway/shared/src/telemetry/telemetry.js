@@ -4,7 +4,8 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
-const sdk = new NodeSDK({
+export function initializeTelemetry (){
+    const sdk = new NodeSDK({
     resource: resourceFromAttributes({
         [SemanticResourceAttributes.SERVICE_NAME]:
             process.env.KAFKA_CLIENT_ID
@@ -22,3 +23,4 @@ const sdk = new NodeSDK({
 sdk.start();
 
 console.log("OpenTelemetry initialized");
+}

@@ -1,5 +1,8 @@
-import "./telemetry.js";
-import "./config/env.js"
+import "./config/env.js";
+
+import { initializeTelemetry } from "@payment-gateway/shared";
+initializeTelemetry();
+
 import { startConsumer } from "./kafka/consumer.js";
 import { retry } from "@payment-gateway/shared";
 
