@@ -95,13 +95,6 @@ This project was built to explore backend architecture patterns commonly used in
 
 ---
 
-# Test
-
-```mermaid
-flowchart LR
-A --> B
-```
-
 # Architecture Diagram
 
 ```mermaid
@@ -203,7 +196,6 @@ sequenceDiagram
 
 # Entity Relationship Diagram
 
-````markdown
 ```mermaid
 erDiagram
 
@@ -233,13 +225,12 @@ erDiagram
 
     PAYMENT ||--o{ OUTBOX : creates
 ```
-````
 
 ---
 
 # Distributed Trace Flow
 
-````markdown
+
 ```mermaid
 flowchart LR
 
@@ -279,13 +270,13 @@ flowchart LR
     Webhook -. Trace .-> Jaeger
     Merchant -. Trace .-> Jaeger
 ```
-````
+
 
 ---
 
 # Transactional Outbox Flow
 
-````markdown
+
 ```mermaid
 flowchart TD
 
@@ -319,7 +310,7 @@ flowchart TD
 
     Kafka --> Consumers
 ```
-````
+
 
 
 # Reliability Patterns
