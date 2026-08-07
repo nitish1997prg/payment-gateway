@@ -95,6 +95,13 @@ This project was built to explore backend architecture patterns commonly used in
 
 ---
 
+# Test
+
+```mermaid
+flowchart LR
+A --> B
+```
+
 # Architecture Diagram
 
 ````markdown
