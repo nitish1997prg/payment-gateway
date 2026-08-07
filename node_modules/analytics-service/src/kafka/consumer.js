@@ -1,13 +1,12 @@
-import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
 import { handlePaymentEvent } from "../handlers/paymentEventHandler.js";
-import { logger } from "../utils/logger.js";
-import {kafka} from "./client.js";
-
 import { trace,context } from "@opentelemetry/api";
-import { extractTraceContext } from "../telemetry/propagation.js";
+import { KAFKA_TOPICS, logger, extractTraceContext, createKafkaClient } from "@payment-gateway/shared";
+
+
 
 const CONSUMER_GROUP = process.env.CONSUMER_GROUP;
 
+const kafka = createKafkaClient();
 const consumer = kafka.consumer({
     groupId: CONSUMER_GROUP
 });

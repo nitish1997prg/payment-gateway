@@ -1,9 +1,6 @@
-import { KAFKA_TOPICS } from "../constants/KafkaTopics.js";
-import { OUTBOX_STATUS } from "../enums/OutboxStatus.js";
 import { publishEvent } from "../kafka/producer.js";
 import { Outbox } from "../models/OutboxEvent.js";
-import { withSpan } from "../telemetry/withSpan.js";
-import { logger } from "../utils/logger.js";
+import { logger,withSpan,OUTBOX_STATUS, KAFKA_TOPICS } from "@payment-gateway/shared";
 
 export async function watchOutbox(){
         try {

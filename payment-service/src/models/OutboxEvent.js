@@ -1,9 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-import { AGGREGATE_TYPES_VALUES } from "../constants/AggregateTypes.js";
-import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
-import { PAYMENT_CURRENCIES } from "../constants/PaymentCurrencies.js";
-import {  PAYMENT_STATUS_VALUES } from "../enums/PaymentStatus.js";
-import { OUTBOX_STATUS_VALUES } from "../enums/OutboxStatus.js";
+import { AGGREGATE_TYPES_VALUES, PAYMENT_EVENTS, PAYMENT_CURRENCIES, PAYMENT_STATUS_VALUES, OUTBOX_STATUS_VALUES } from "@payment-gateway/shared";
 
 
 const outboxEventSchema = new mongoose.Schema({

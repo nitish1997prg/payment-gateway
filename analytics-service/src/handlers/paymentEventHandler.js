@@ -1,5 +1,5 @@
-import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { AnalyticsService } from "../services/analyticsService.js";
+import {PAYMENT_EVENTS} from "@payment-gateway/shared";
 
 export async function handlePaymentEvent(event) {
 

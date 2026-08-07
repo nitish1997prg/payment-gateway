@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { PAYMENT_CURRENCIES } from "../constants/PaymentCurrencies.js";
+import { PAYMENT_CURRENCIES } from "@payment-gateway/shared";
 
 export const createPaymentSchema = z.object({
     merchantId: z.uuidv4({error: "MerchantID is not a valid UUID!"}),

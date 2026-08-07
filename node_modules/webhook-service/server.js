@@ -3,7 +3,7 @@ import "./config/env.js";
 import {app} from "./app.js";
 import { startConsumer } from "./kafka/consumer.js";
 import { startWebhookWorker } from "./queue/webhookWorker.js";
-import { retry } from "./utils/retry.js";
+import { retry } from "@payment-gateway/shared";
 
 const PORT = process.env.PORT;
 

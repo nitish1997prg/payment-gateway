@@ -1,9 +1,8 @@
 import "./telemetry.js";
 import "./config/env.js";
-import { connectDb } from "./config/db.js";
 import { app } from "./app.js";
 import { startConsumer } from "./kafka/consumer.js";
-import { retry } from "./utils/retry.js";
+import { retry, connectMongo } from "@payment-gateway/shared";
 
 const PORT = process.env.PORT;
 const MONGO_URI =  process.env.MONGO_URI;
@@ -12,7 +11,7 @@ async function startServer(){
     try {
         //Connect to MongoDB
        await retry(
-                    ()=>connectDb(MONGO_URI),{
+                    ()=>connectMongo(MONGO_URI),{
                         operationName: "MongoDB Connection"
                     });
 

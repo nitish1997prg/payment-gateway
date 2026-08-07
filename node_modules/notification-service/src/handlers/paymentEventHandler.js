@@ -1,6 +1,4 @@
-import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
-import { logger } from "../utils/logger.js";
-import { withSpan } from "../telemetry/withSpan.js";
+import {PAYMENT_EVENTS, logger, withSpan} from "@payment-gateway/shared";
 
 export async function handlePaymentEvent(event) {
 

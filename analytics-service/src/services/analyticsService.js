@@ -1,6 +1,6 @@
 import { Analytics } from "../models/Analytics.js";
 import { getCurrentAnalyticsDate } from "../utils/date.js";
-import {withSpan} from "../telemetry/withSpan.js";
+import { withSpan } from "@payment-gateway/shared";
 
 export async function recordPaymentCreated(payment){
     return withSpan("Payment Created",async ()=>{

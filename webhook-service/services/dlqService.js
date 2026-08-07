@@ -1,5 +1,5 @@
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
-import { logger } from "../utils/logger.js";
+import { logger } from "@payment-gateway/shared";
 
 export async function getFailedJobs(){
     const jobs = await webhookDeliveryQueue.getFailed();

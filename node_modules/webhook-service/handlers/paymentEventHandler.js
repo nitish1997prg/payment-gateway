@@ -1,9 +1,6 @@
-import { PAYMENT_EVENTS } from "../constants/PaymentEvents.js";
 import { sendWebhook } from "../services/webhookService.js";
 import { webhookDeliveryQueue } from "../queue/webhookQueue.js";
-import { logger } from "../utils/logger.js";
-import { withSpan } from "../telemetry/withSpan.js";
-import { injectTraceContext } from "../telemetry/propagation.js";
+import {PAYMENT_EVENTS, logger, withSpan, injectTraceContext} from "@payment-gateway/shared";
 
 export async function handlePaymentEvent(event) {
     try {
