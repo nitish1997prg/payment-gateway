@@ -161,7 +161,6 @@ flowchart LR
 
 # Payment Capture Sequence Diagram
 
-````markdown
 ```mermaid
 sequenceDiagram
 
@@ -170,41 +169,36 @@ sequenceDiagram
     participant MongoDB
     participant Outbox
     participant Kafka
-    participant Notification
-    participant Analytics
-    participant Webhook
+    participant NotificationService
+    participant AnalyticsService
+    participant WebhookService
     participant BullMQ
-    participant Worker
-    participant Merchant
+    participant MerchantDemo
 
-    Client->>PaymentService: Capture Payment
+    Client->>PaymentService: POST /payments/{id}/capture
 
-    PaymentService->>MongoDB: Update Payment
-    PaymentService->>MongoDB: Insert Outbox Event
+    PaymentService->>MongoDB: Update Payment Status
+    PaymentService->>MongoDB: Create Outbox Event
 
     MongoDB-->>PaymentService: Commit Transaction
 
     PaymentService->>Outbox: Watch Change Stream
     Outbox->>Kafka: Publish payment.captured
 
-    Kafka-->>Notification: Consume Event
-    Notification-->>Notification: Send Notification
+    Kafka-->>NotificationService: Consume Event
+    NotificationService-->>NotificationService: Send Notification
 
-    Kafka-->>Analytics: Consume Event
-    Analytics-->>Analytics: Record Analytics
+    Kafka-->>AnalyticsService: Consume Event
+    AnalyticsService-->>AnalyticsService: Record Analytics
 
-    Kafka-->>Webhook: Consume Event
+    Kafka-->>WebhookService: Consume Event
+    WebhookService->>BullMQ: Add Webhook Job
 
-    Webhook->>BullMQ: Enqueue Webhook Job
+    BullMQ->>WebhookService: Execute Worker
+    WebhookService->>MerchantDemo: POST Webhook
 
-    BullMQ->>Worker: Execute Job
-
-    Worker->>Merchant: POST /webhooks/payment
-
-    Merchant-->>Worker: 200 OK
+    MerchantDemo-->>WebhookService: 200 OK
 ```
-````
-
 ---
 
 # Entity Relationship Diagram
@@ -214,8 +208,7 @@ sequenceDiagram
 erDiagram
 
     PAYMENT {
-
-        string paymentId PK
+        string paymentId
         string merchantId
         string referenceId
         string customerId
@@ -224,22 +217,18 @@ erDiagram
         string status
         datetime createdAt
         datetime updatedAt
-
     }
 
     OUTBOX {
-
-        string eventId PK
-        string aggregateId FK
+        string eventId
+        string aggregateId
         string aggregateType
         string eventType
         string status
-        object payload
         number retryCount
         string lastError
         datetime publishedAt
         datetime createdAt
-
     }
 
     PAYMENT ||--o{ OUTBOX : creates
@@ -254,11 +243,11 @@ erDiagram
 ```mermaid
 flowchart LR
 
-    Client
+    Client["Client"]
 
     Payment["Payment Service"]
 
-    Kafka[(Kafka)]
+    Kafka["Kafka"]
 
     Notification["Notification Service"]
 
@@ -266,11 +255,11 @@ flowchart LR
 
     Webhook["Webhook Service"]
 
-    Queue["BullMQ"]
-
-    Worker["Webhook Worker"]
+    BullMQ["BullMQ"]
 
     Merchant["Merchant Demo"]
+
+    Jaeger["Jaeger"]
 
     Client --> Payment
 
@@ -280,11 +269,15 @@ flowchart LR
     Kafka --> Analytics
     Kafka --> Webhook
 
-    Webhook --> Queue
+    Webhook --> BullMQ
 
-    Queue --> Worker
+    BullMQ --> Merchant
 
-    Worker --> Merchant
+    Payment -. Trace .-> Jaeger
+    Notification -. Trace .-> Jaeger
+    Analytics -. Trace .-> Jaeger
+    Webhook -. Trace .-> Jaeger
+    Merchant -. Trace .-> Jaeger
 ```
 ````
 
@@ -298,24 +291,24 @@ flowchart TD
 
     Request["Capture Payment Request"]
 
-    Tx["MongoDB Transaction"]
+    Transaction["MongoDB Transaction"]
 
     Payment["Update Payment"]
 
-    Outbox["Insert Outbox Event"]
+    Outbox["Create Outbox Event"]
 
-    Commit["Commit"]
+    Commit["Commit Transaction"]
 
     Watcher["Outbox Change Stream"]
 
-    Kafka[(Kafka)]
+    Kafka["Kafka"]
 
     Consumers["Consumers"]
 
-    Request --> Tx
+    Request --> Transaction
 
-    Tx --> Payment
-    Tx --> Outbox
+    Transaction --> Payment
+    Transaction --> Outbox
 
     Payment --> Commit
     Outbox --> Commit
